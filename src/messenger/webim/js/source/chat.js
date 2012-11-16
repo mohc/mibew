@@ -63,6 +63,8 @@ Ajax.ChatThreadUpdater = Class.create();
 Class.inherit( Ajax.ChatThreadUpdater, Ajax.Base, {
 
   initialize: function(_options) {
+    this.haveMessage = false;
+    this.isInit = true;
     this.setOptions(_options);
     this._options.onComplete = this.requestComplete.bind(this);
     this._options.onException = this.handleException.bind(this);
@@ -78,8 +80,18 @@ Class.inherit( Ajax.ChatThreadUpdater, Ajax.Base, {
 	FrameUtils.initFrame(this._options.container);
     if( this._options.message ) {
 		this._options.message.onkeydown = this.handleKeyDown.bind(this);
-		this._options.message.onfocus = (function() { this.focused = true; }).bind(this);
+		this._options.message.onfocus = (function() { 
+      this.focused = true;
+      this.haveMessage = false;
+    }).bind(this);
+
+    window.onfocus = (function() { 
+      this.focused = true;
+      this.haveMessage = false;
+    }).bind(this);
+
 		this._options.message.onblur = (function() { this.focused = false; }).bind(this)
+    this.messageFlashed = false;
 	}
     this.update();
   },
@@ -205,8 +217,6 @@ Class.inherit( Ajax.ChatThreadUpdater, Ajax.Base, {
   },
 
   updateContent: function(xmlRoot) {
-	var haveMessage = false;
-
    	var result_div = this._options.container;
 	var _lastid = NodeUtils.getAttrValue(xmlRoot, "lastid");
 	if( _lastid ) {
@@ -228,12 +238,12 @@ Class.inherit( Ajax.ChatThreadUpdater, Ajax.Base, {
 	for( var i = 0; i < xmlRoot.childNodes.length; i++ ) {
 		var node = xmlRoot.childNodes[i];
 		if( node.tagName == 'message' ) {
-        	haveMessage = true;
+      this.haveMessage = true;
 			this.processMessage(result_div, node);
 		} else if( node.tagName == 'avatar' ) {
 			this.setupAvatar(node);
-        }
-	}
+    }
+  }
 	if(window.location.search.indexOf('trace=on')>=0) {
 		var val = "updated";
 		if(this.lastupdate > 0) {
@@ -248,19 +258,29 @@ Class.inherit( Ajax.ChatThreadUpdater, Ajax.Base, {
 	} else {
 		this.clearStatus();
 	}
-	if( haveMessage ) {
+	if(this.haveMessage ) {
 		FrameUtils.scrollDown(this._options.container);
 		if(!this.skipNextsound) {
 			var tsound = $('soundimg');
 			if(tsound == null || tsound.className.match(new RegExp("\\bisound\\b")) ) {
 				playSound(Chat.webimRoot+'/sounds/new_message.wav');
+
+        if(this.isInit){
+          this.isInit = false;
+          this.haveMessage = false;
+        } else {
+          flashNewMessage(this.messageFlashed);
+        }
+        this.messageFlashed = !this.messageFlashed;
 			}
-		}
-		if( !this.focused ) {
-			window.focus();
-		}
-	}
-  },
+
+      if( !this.focused ) {
+        window.focus();
+      }
+    }
+  } else {
+    flashNewMessage(true);
+  }},
 
   isSendkey: function(ctrlpressed, key) {
 	  return ((key==13 && (ctrlpressed || this._options.ignorectrl)) || (key==10));

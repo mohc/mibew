@@ -519,3 +519,11 @@ function playSound(wav_file) {
 function htmlescape(str) {
 	return str.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace('"','&quot;');
 }
+
+function flashNewMessage(msgFlashed){
+  if(! msgFlashed){
+    document.title = 'There is a new message !';
+  } else {
+    document.title = 'Drthom web messenger';
+  }
+}
