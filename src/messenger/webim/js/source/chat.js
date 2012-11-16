@@ -64,7 +64,6 @@ Class.inherit( Ajax.ChatThreadUpdater, Ajax.Base, {
 
   initialize: function(_options) {
     this.haveMessage = false;
-    this.isInit = true;
     this.setOptions(_options);
     this._options.onComplete = this.requestComplete.bind(this);
     this._options.onException = this.handleException.bind(this);
@@ -82,12 +81,16 @@ Class.inherit( Ajax.ChatThreadUpdater, Ajax.Base, {
 		this._options.message.onkeydown = this.handleKeyDown.bind(this);
 		this._options.message.onfocus = (function() { 
       this.focused = true;
-      this.haveMessage = false;
     }).bind(this);
 
     window.onfocus = (function() { 
       this.focused = true;
       this.haveMessage = false;
+    }).bind(this);
+
+
+    window.onblur = (function() { 
+      this.focused = false;
     }).bind(this);
 
 		this._options.message.onblur = (function() { this.focused = false; }).bind(this)
@@ -265,8 +268,7 @@ Class.inherit( Ajax.ChatThreadUpdater, Ajax.Base, {
 			if(tsound == null || tsound.className.match(new RegExp("\\bisound\\b")) ) {
 				playSound(Chat.webimRoot+'/sounds/new_message.wav');
 
-        if(this.isInit){
-          this.isInit = false;
+        if(this.focused){
           this.haveMessage = false;
         } else {
           flashNewMessage(this.messageFlashed);
