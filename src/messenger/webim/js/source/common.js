@@ -523,7 +523,9 @@ function htmlescape(str) {
 function flashNewMessage(msgFlashed){
   if(! msgFlashed){
     document.title = 'There is a new message !';
+    document.bgColor = "#990000";
   } else {
     document.title = 'Drthom web messenger';
+    document.bgColor = "#999999";
   }
 }
