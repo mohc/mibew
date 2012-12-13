@@ -521,11 +521,11 @@ function htmlescape(str) {
 }
 
 function flashNewMessage(msgFlashed){
-  if(! msgFlashed){
-    document.title = 'There is a new message !';
-    document.bgColor = "#990000";
-  } else {
+  if(msgFlashed){
     document.title = 'Drthom web messenger';
-    document.bgColor = "#999999";
+    document.getElementById("redbg").id = "greybg";
+  } else {
+    document.title = 'There is a new message !';
+    document.getElementById("greybg").id = "redbg";
   }
 }

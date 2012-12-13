@@ -276,9 +276,12 @@ Class.inherit( Ajax.ChatThreadUpdater, Ajax.Base, {
         this.messageFlashed = !this.messageFlashed;
 			}
 
+     /* 
       if( !this.focused ) {
         window.focus();
       }
+      */
+      
     }
   } else {
     flashNewMessage(true);
